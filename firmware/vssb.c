@@ -19,11 +19,6 @@
 #include <avr/sleep.h>
 #include <util/delay.h>
 
-void disableWatchdog();
-void enableWatchdog();
-
-uint8_t count=0;
-
 int main()
 {
 	// Initialize pins
@@ -48,29 +43,9 @@ int main()
 // So toggling PB3 at each rising edge gives /2
 // Also, when counting, toggle PB4 to give /4
 ISR(INT0_vect) {
+	static uint8_t count=0;
 	PINB |= (1<<PB3); // Toggle the output pin
 	if (count++ & 0x01) {
 		PINB |= (1<<PB4);
 	}
-}
-
-
-inline void disableWatchdog()
-{
-	// disable watchdog reset mode and interrupt mode
-	WDTCR |= _BV(WDE) | _BV(WDCE);
-	WDTCR &= ~_BV(WDE);
-}
-
-inline void enableWatchdog()
-{
-	// Enable watchdog interrupt, set prescaling to 1 sec
-	WDTCR |= _BV(WDIE) | _BV(WDP2) | _BV(WDP1);
-}
-
-// 8MHz / 64 = 125000
-void slowClock()
-{
-	CLKPR = _BV(CLKPCE); // enable change to clock prescaler
-	CLKPR = _BV(CLKPS2) | _BV(CLKPS1); // scale = /64
 }
