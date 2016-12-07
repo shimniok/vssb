@@ -23,9 +23,8 @@ int main()
 {
 	// Initialize pins
 	MCUCR &= ~(1<<PUD); // disable pull-ups
-	PORTB = 0;
-	PINB = 0;
-	DDRB = (1<<PB4)|(1<<PB3);
+	DDRB |= (1<<PB3)|(1<<PB4);
+	PORTB |= (1<<PB3)|(1<<PB4);
 
 	// Set up INT0 pin interrupt on rising edge
 	MCUCR |= (1<<ISC01)|(1<<ISC00);
@@ -34,8 +33,6 @@ int main()
 	sei();
 
 	while (1) {
-		//set_sleep_mode(SLEEP_MODE_PWR_DOWN);
-		//sleep_mode();
 	}
 }
 
@@ -44,6 +41,7 @@ int main()
 // Also, when counting, toggle PB4 to give /4
 ISR(INT0_vect) {
 	static uint8_t count=0;
+
 	PINB |= (1<<PB3); // Toggle the output pin
 	if (count++ & 0x01) {
 		PINB |= (1<<PB4);
